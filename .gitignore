@@ -8,3 +8,6 @@
 # Fresh build directory
 _fresh/
 _fresh/*
+
+# Generated images
+static/placeholders/*
