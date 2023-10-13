@@ -1,4 +1,4 @@
-# Fresh Images Demo
+# [Fresh Images Demo](https://fresh-images.deno.dev)
 
 Example project using the
 [Fresh Images plugin](https://deno.land/x/fresh_images).
