@@ -6,21 +6,26 @@ import ImagesPlugin, {
   transform,
 } from "fresh_images/mod.ts";
 import { crop, resize, rotate } from "fresh_images/transformer.ts";
+import type { ImagesPluginOptions } from "fresh_images/src/types.ts";
 import { decode, GIF, Image } from "imagescript/mod.ts";
 import caption from "./transformers/canvasExample.ts";
+import { join } from "$std/path/mod.ts";
 
 /**
  * Custom transformer example.
  * Rotate an image hue by a random number of degrees.\
  * Optionally accept a query parameter to invert the hue. (Requires extending the key map.)
  */
-const myTransformer = (img: Image | GIF, req: Request) => {
+const myTransformer = async (img: Image | GIF, req: Request) => {
   const randomDegrees = Math.floor(Math.random() * 360);
 
   const invert = getParam(req, "invert", extendKeyMap({ invert: "i" }));
 
   if (invert) {
-    return transform(img, (img) => Promise.resolve((img as Image).invertHue()));
+    img = await transform(
+      img,
+      (img) => Promise.resolve((img as Image).invertHue()),
+    );
   }
 
   return transform(
@@ -32,10 +37,13 @@ const myTransformer = (img: Image | GIF, req: Request) => {
 /**
  * Pre-optimize images before serving them.
  */
-const myBuildFunction = async () => {
+const myBuildFunction: ImagesPluginOptions["build"] = async ({
+  realPath,
+}) => {
+  const targetDir = realPath ?? "./static";
   const files = Deno.readDir("./static/image");
 
-  await ensureDir("./static/placeholders");
+  await ensureDir(targetDir);
 
   for await (const file of files) {
     if (!file.isFile) {
@@ -49,16 +57,18 @@ const myBuildFunction = async () => {
       (img) => Promise.resolve((img as Image).resize(Image.RESIZE_AUTO, 100)),
     );
 
+    // Encode at lowest quality
+
     if (output instanceof GIF) {
       await Deno.writeFile(
-        `./static/placeholders/${file.name}`,
+        join(targetDir, file.name),
         await output.encode(30),
       );
       continue;
     }
 
     await Deno.writeFile(
-      `./static/placeholders/${file.name}`,
+      join(targetDir, file.name),
       await output.encodeJPEG(1),
     );
   }
