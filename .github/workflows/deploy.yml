@@ -1,0 +1,39 @@
+name: Deploy
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: main
+
+jobs:
+  deploy:
+    name: Build and Deploy
+    runs-on: ubuntu-latest
+
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+      - name: Clone repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Install Deno
+        uses: denoland/setup-deno@v1
+        with:
+          deno-version: v1.x
+
+      # Generate static images
+      - name: Build step
+        run: |
+            deno task build
+            mkdir -p _fresh/static/placholders
+            cp -r static/placeholders/* _fresh/static/placeholders
+
+      - name: Upload to Deno Deploy
+        uses: denoland/deployctl@v1
+        with:
+          project: "fresh-images"
+          entrypoint: "./main.ts"
