@@ -9,7 +9,7 @@ import { crop, resize, rotate } from "fresh_images/transformer.ts";
 import type { ImagesPluginOptions } from "fresh_images/src/types.ts";
 import { decode, GIF, Image } from "imagescript/mod.ts";
 import caption from "./transformers/canvasExample.ts";
-import { join } from "$std/path/mod.ts";
+import { basename, extname, join } from "$std/path/mod.ts";
 
 /**
  * Custom transformer example.
@@ -58,17 +58,18 @@ const myBuildFunction: ImagesPluginOptions["build"] = async ({
     );
 
     // Encode at lowest quality
+    const fileName = basename(file.name, extname(file.name));
 
     if (output instanceof GIF) {
       await Deno.writeFile(
-        join(targetDir, file.name),
+        join(targetDir, `${fileName}.gif`),
         await output.encode(30),
       );
       continue;
     }
 
     await Deno.writeFile(
-      join(targetDir, file.name),
+      join(targetDir, `${fileName}.jpg`),
       await output.encodeJPEG(1),
     );
   }
@@ -96,7 +97,6 @@ export default defineConfig({
             ),
         },
       },
-      build: myBuildFunction,
     }),
     ImagesPlugin({
       // Create a different route for the placeholder images. (Nested directory routes are currently not supported.)
@@ -106,6 +106,7 @@ export default defineConfig({
       transformers: {
         cool: myTransformer,
       },
+      build: myBuildFunction,
     }),
   ],
 });
