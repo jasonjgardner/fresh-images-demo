@@ -5,7 +5,7 @@ export default function Gallery() {
     <div>
       <FreshImage
         src="/img/carrots.png?fn=cool&fn=resize&rw=400"
-        placeholder="/img/placeholder/carrots.png?fn=cool"
+        placeholder="/img/placeholder/carrots.jpg?fn=cool"
         alt="Custom transformer demo"
       />
       <FreshImage
