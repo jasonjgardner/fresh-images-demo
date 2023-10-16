@@ -27,6 +27,10 @@ jobs:
 
       # Generate static images
       - name: Build step
+        env:
+          FRESH_IMAGES_USE_HEADERS: true
+          FRESH_IMAGES_USE_KV: true
+          FRESH_IMAGES_USE_CACHE: true
         run: |
             deno task build
             mkdir -p _fresh/static/placholders
