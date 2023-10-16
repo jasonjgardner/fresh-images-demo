@@ -1,4 +1,4 @@
-import { AppProps } from "$fresh/server.ts";
+import { AppProps, type Handlers } from "$fresh/server.ts";
 
 export default function App({ Component }: AppProps) {
   return (
@@ -6,8 +6,8 @@ export default function App({ Component }: AppProps) {
       <head>
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>fresh-images</title>
-        <link rel="stylesheet" href="/styles.css" />
+        <title>Fresh Image Plugin Demo</title>
+        <link href="/style.css" rel="stylesheet" />
       </head>
       <body>
         <Component />

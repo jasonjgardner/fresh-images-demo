@@ -1,0 +1,35 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer component {
+    .fresh-image {
+        @apply relative overflow-hidden rounded-lg shadow-lg bg-gray-100
+    }
+
+    .fresh-image__placeholder {
+        @apply absolute inset-0 w-full h-full object-cover filter blur-sm z-0
+    }
+
+    .fresh-image__image {
+        @apply inset-0 w-full h-full object-cover rounded-lg
+    }
+}
+
+@layer component {
+    .gallery {
+        @apply grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4
+    }
+
+    .gallery__caption {
+        @apply text-center text-sm text-gray-800 font-sans font-normal px-2 py-1
+    }
+}
+
+.gallery .fresh-image {
+    @apply mb-auto p-1 border border-gray-300
+}
+
+body {
+    @apply bg-blue-100
+}

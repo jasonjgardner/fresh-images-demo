@@ -11,6 +11,36 @@ import { decode, GIF, Image } from "imagescript/mod.ts";
 import caption from "./transformers/canvasExample.ts";
 import { basename, extname, join } from "$std/path/mod.ts";
 
+// Website dependencies
+import postcss from "https://deno.land/x/postcss@8.4.16/mod.js";
+import autoprefixer from "npm:autoprefixer";
+import tailwind from "npm:tailwindcss";
+
+/**
+ * Process Tailwindcss stylesheets.
+ * (`.fresh-image` components do not have styles by default.)
+ */
+async function processTailwind() {
+  const plugins = [
+    autoprefixer,
+    tailwind({
+      content: [
+        "./routes/**/*.{tsx,jsx,ts,js}",
+        "./islands/**/*.{tsx,jsx,ts,js}",
+        "./components/**/*.{tsx,jsx,ts,js}",
+      ],
+    }),
+  ];
+
+  const stylesheet = await Deno.readTextFile("./style.css");
+  const processed = (await postcss(plugins).process(stylesheet, {
+    from: "./style.css",
+    to: "./static/style.css",
+  })).css;
+
+  await Deno.writeTextFile("./static/style.css", processed);
+}
+
 /**
  * Custom transformer example.
  * Rotate an image hue by a random number of degrees.\
@@ -97,6 +127,9 @@ export default defineConfig({
             ),
         },
       },
+      middleware: {
+        rateLimit: 1000,
+      },
     }),
     ImagesPlugin({
       // Create a different route for the placeholder images. (Nested directory routes are currently not supported.)
@@ -107,6 +140,14 @@ export default defineConfig({
         cool: myTransformer,
       },
       build: myBuildFunction,
+      middleware: {
+        rateLimit: 1000,
+        rateLimitDuration: 30,
+      },
     }),
+    {
+      name: "tailwind",
+      buildStart: processTailwind,
+    },
   ],
 });
